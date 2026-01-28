@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nigeria Bank Account Verification Demo</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+    .box {
+      background: #fff;
+      padding: 25px;
+      max-width: 400px;
+      margin: auto;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    input, select, button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background: black;
+      color: white;
+      cursor: pointer;
+    }
+    .result {
+      margin-top: 15px;
+      padding: 12px;
+      background: #e2ffe4;
+      border-left: 5px solid green;
+      display: none;
+    }
+    .error {
+      margin-top: 15px;
+      padding: 12px;
+      background: #ffe2e2;
+      border-left: 5px solid red;
+      display: none;
+    }
+  </style>
+<!-- PWA Configuration -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#7c3aed">
+<meta name="description" content="A fast, secure banking dashboard with Paystack integration">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%237c3aed' width='192' height='192'/><text x='50%' y='50%' font-size='80' font-weight='bold' fill='white' text-anchor='middle' dy='.3em' font-family='sans-serif'>P</text></svg>">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%237c3aed' width='180' height='180' rx='40'/><text x='50%' y='50%' font-size='80' font-weight='bold' fill='white' text-anchor='middle' dy='.3em' font-family='sans-serif'>P</text></svg>">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PalmPay">
+</head>
+
+<body>
+
+  <div class="box">
+    <h2>Nigeria Bank Account Checker (Demo)</h2>
+
+    <select id="bank">
+      <option value="">Select Bank</option>
+
+      <!-- MAJOR NIGERIAN BANKS -->
+      <option value="044">Access Bank</option>
+      <option value="063">Access Bank (Diamond)</option>
+      <option value="050">Ecobank</option>
+      <option value="011">First Bank</option>
+      <option value="214">FCMB</option>
+      <option value="058">GTBank</option>
+      <option value="030">Heritage Bank</option>
+      <option value="082">Keystone Bank</option>
+      <option value="221">Stanbic IBTC</option>
+      <option value="232">Sterling Bank</option>
+      <option value="032">Union Bank</option>
+      <option value="033">UBA</option>
+      <option value="215">Unity Bank</option>
+      <option value="035">Wema Bank</option>
+      <option value="057">Zenith Bank</option>
+
+      <!-- FINTECH BANKS -->
+      <option value="999001">Opay</option>
+      <option value="999002">PalmPay</option>
+      <option value="999003">MoniePoint</option>
+      <option value="999004">Kuda Bank</option>
+      <option value="999005">Rubies Bank</option>
+      <option value="999006">Vbank</option>
+    </select>
+
+    <input type="number" id="acct" placeholder="Enter 10-digit Account Number" />
+
+    <button onclick="verify()">Verify Account</button>
+
+    <div id="result" class="result"></div>
+    <div id="error" class="error"></div>
+  </div>
+
+  <script>
+    function verify() {
+      const bank = document.getElementById("bank").value;
+      const acct = document.getElementById("acct").value;
+      const result = document.getElementById("result");
+      const error = document.getElementById("error");
+
+      result.style.display = "none";
+      error.style.display = "none";
+
+      if (!bank || acct.length !== 10) {
+        error.style.display = "block";
+        error.innerText = "Please select a bank and enter a valid 10-digit account number.";
+        return;
+      }
+
+      // MOCK API RESPONSE
+      const dummyNames = [
+        "SALAM ADEDAYO",
+        "TIAMIYU ABDULSALAM",
+        "VICTOR EMMANUEL",
+        "CHINEDU OKAFOR",
+        "AMINA BELLO",
+        "DAVID JOHNSON",
+        "MARY PETER",
+        "JOSEPH ADEWALE"
+      ];
+
+      const bankNames = {
+        "044": "Access Bank",
+        "063": "Access Bank (Diamond)",
+        "050": "Ecobank",
+        "011": "First Bank",
+        "214": "FCMB",
+        "058": "GTBank",
+        "030": "Heritage Bank",
+        "082": "Keystone Bank",
+        "221": "Stanbic IBTC",
+        "232": "Sterling Bank",
+        "032": "Union Bank",
+        "033": "UBA",
+        "215": "Unity Bank",
+        "035": "Wema Bank",
+        "057": "Zenith Bank",
+        "999001": "Opay",
+        "999002": "PalmPay",
+        "999003": "MoniePoint",
+        "999004": "Kuda Bank",
+        "999005": "Rubies Bank",
+        "999006": "Vbank"
+      };
+
+      const randomName = dummyNames[Math.floor(Math.random() * dummyNames.length)];
+      const bankName = bankNames[bank];
+
+      setTimeout(() => {
+        result.style.display = "block";
+        result.innerHTML = `
+          <strong>Account Verified!</strong><br>
+          Bank: ${bankName}<br>
+          Account Number: ${acct}<br>
+          Account Name: ${randomName}
+        `;
+      }, 900);
+    }
+  </script>
+
+<!-- PWA Service Worker Registration -->
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js')
+      .then(registration => {
+        console.log('✓ Service Worker registered:', registration.scope);
+      })
+      .catch(error => {
+        console.error('✗ Service Worker registration failed:', error);
+      });
+  });
+}
+
+// Prompt for PWA installation
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  console.log('PWA is installable');
+});
+
+window.addEventListener('appinstalled', () => {
+  console.log('✓ PWA installed successfully');
+  deferredPrompt = null;
+});
+</script>
+
+</body>
+</html>

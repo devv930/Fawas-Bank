@@ -1,0 +1,72 @@
+{
+  "name": "PalmPay Mobile App",
+  "short_name": "PalmPay App",
+  "description": "A fast, secure banking dashboard with Paystack integration",
+  "start_url": "/?v=4",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#7c3aed",
+  "background_color": "#0f0f12",
+  "icons": [
+    {
+      "src": "palmpay logo.webp",
+      "sizes": "192x192",
+      "type": "image/webp",
+      "purpose": "any"
+    },
+    {
+      "src": "palmpay logo.webp",
+      "sizes": "512x512",
+      "type": "image/webp",
+      "purpose": "any"
+    },
+    {
+      "src": "palmpay logo.webp",
+      "sizes": "192x192",
+      "type": "image/webp",
+      "purpose": "maskable"
+    },
+    {
+      "src": "palmpay logo.webp",
+      "sizes": "512x512",
+      "type": "image/webp",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["finance"],
+  "screenshots": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 540 720'><rect fill='%230f0f12' width='540' height='720'/></svg>",
+      "sizes": "540x720",
+      "type": "image/svg+xml",
+      "form_factor": "narrow"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Transfer Money",
+      "short_name": "Transfer",
+      "description": "Quick access to money transfer",
+      "url": "/To Bank.html",
+      "icons": [
+        {
+          "src": "palmpay logo.webp",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Transaction History",
+      "short_name": "History",
+      "description": "View your transaction history",
+      "url": "/Transaction History.html",
+      "icons": [
+        {
+          "src": "palmpay logo.webp",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}

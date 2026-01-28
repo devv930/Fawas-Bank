@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<title>Transfer To Bank - PalmPay</title>
+<style>
+  :root {
+    --bg: #0f0f12;
+    --panel: #17171c;
+    --muted: #9aa2b2;
+    --purple: #7c3aed;
+    --purple-2: #5b21b6;
+    --card: #17171c;
+    --accent: #ffd166;
+    --receipt-bg: #17171c;
+    --select-bg: #0b0b0c;
+    --select-border: rgba(255,255,255,0.1);
+    --tx-bg: #1a1a1f;
+    --dropdown-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  }
+  [data-theme="light"] {
+    --bg: #f5f5f7;
+    --panel: #ffffff;
+    --muted: #6b7280;
+    --purple: #7c3aed;
+    --purple-2: #5b21b6;
+    --card: #ffffff;
+    --accent: #ffd166;
+  }
+  * { box-sizing: border-box; }
+  html, body { 
+    height: 100dvh; 
+    margin: 0; 
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; 
+    background: var(--bg); 
+    color: var(--text-color, #fff); 
+    -webkit-font-smoothing: antialiased; 
+    overflow-x: hidden;
+    line-height: 1.5;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  [data-theme="light"] {
+    --text-color: #111;
+  }
+  .app { 
+    max-width: 420px; 
+    margin: 0 auto; 
+    min-height: 100dvh; 
+    display: flex; 
+    flex-direction: column; 
+    padding-bottom: 20px; 
+  }
+  header { 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    padding: 12px; 
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+    border-bottom: 1px solid var(--header-border, rgba(255,255,255,0.03));
+    transition: background 0.3s ease, border 0.3s ease;
+  }
+  [data-theme="light"] {
+    --header-border: rgba(0,0,0,0.1);
+  }
+  .back-btn {
+    background: var(--icon-bg, #0f1113);
+    border: 1px solid var(--icon-border, rgba(255,255,255,0.03));
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.3s ease, border 0.3s ease;
+  }
+  [data-theme="light"] {
+    --icon-bg: #f0f0f0;
+    --icon-border: rgba(0,0,0,0.1);
+  }
+  .header-title {
+    flex: 1;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-color, #fff);
+    transition: color 0.3s ease;
+  }
+  .icons { display: flex; gap: 6px; align-items: center; }
+  .icon-btn { 
+    width: 32px; 
+    height: 32px; 
+    border-radius: 8px; 
+    background: var(--icon-bg, #0f1113); 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    border: 1px solid var(--icon-border, rgba(255,255,255,0.03)); 
+    cursor: pointer;
+    transition: background 0.3s ease, border 0.3s ease;
+  }
+  .form-card { 
+    margin: 16px 12px; 
+    padding: 20px; 
+    border-radius: 12px; 
+    background: var(--form-bg, #0f1113); 
+    border: 1px solid var(--form-border, rgba(255,255,255,0.02)); 
+    transition: background 0.3s ease, border 0.3s ease;
+    overflow: visible;
+  }
+  [data-theme="light"] {
+    --form-bg: rgba(255, 255, 255, 0.95);
+    --form-border: rgba(0,0,0,0.1);
+    --input-bg: #ffffff;
+    --input-border: rgba(0,0,0,0.1);
+    --select-bg: #ffffff;
+    --select-border: rgba(0,0,0,0.15);
+    --receipt-bg: #ffffff;
+    --tx-bg: #f5f5f7;
+    --dropdown-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  }
+  input[type="text"], input[type="number"] { 
+    width: 100%; 
+    padding: 12px; 
+    border-radius: 8px; 
+    border: 1px solid var(--input-border, rgba(255,255,255,0.05)); 
+    margin: 8px 0; 
+    background: var(--input-bg, #0b0b0c); 
+    color: var(--text-color, #fff); 
+    font-size: 14px; 
+    transition: background 0.3s ease, color 0.3s ease, border 0.3s ease;
+  }
+  input:focus {
+    outline: none;
+    border-color: var(--purple);
+  }
+  .primary { 
+    background: var(--purple); 
+    border: none; 
+    color: #fff; 
+    padding: 12px; 
+    border-radius: 8px; 
+    width: 100%; 
+    font-weight: 700; 
+    cursor: pointer; 
+    font-size: 14px; 
+    transition: opacity 0.3s ease;
+  }
+  .primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .primary.loading {
+    opacity: 0.7;
+    cursor: wait;
+  }
+  .small-btn {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--form-border, rgba(255,255,255,0.02));
+    background: var(--input-bg, #0b0b0c);
+    color: var(--text-color, #fff);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s ease, border 0.3s ease, color 0.3s ease;
+  }
+  .small-btn.ghost {
+    background: transparent;
+    border: 1px solid var(--form-border, rgba(255,255,255,0.1));
+  }
+  .status { margin-top: 8px; font-size: 13px; min-height: 18px; }
+  .success-screen { 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
+    display: none; 
+    flex-direction: column; 
+    background: var(--bg); 
+    z-index: 100; 
+    overflow-y: auto; 
+    padding: 0; 
+    transition: background 0.3s ease;
+  }
+  .success-screen.active { display: flex; }
+  .receipt-top-bar { 
+    display: flex; 
+    align-items: center; 
+    padding: 16px; 
+    background: var(--bg); 
+    position: sticky; 
+    top: 0; 
+    z-index: 1; 
+    gap: 10px; 
+  }
+  .receipt-back-btn { 
+    background: transparent; 
+    border: none; 
+    color: var(--text-color, #fff); 
+    font-size: 18px; 
+    cursor: pointer; 
+    transition: color 0.3s ease;
+  }
+  .receipt-title { 
+    font-size: 16px; 
+    font-weight: 600; 
+    color: var(--text-color, #fff);
+    transition: color 0.3s ease;
+  }
+  .receipt-container {
+    background: var(--receipt-bg, #17171c);
+    padding: 24px;
+    border-radius: 20px;
+    margin: 16px;
+    transition: background 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .receipt-container::before {
+    content: "PalmPay  PalmPay  PalmPay  PalmPay";
+    position: absolute;
+    inset: 0;
+    color: rgba(255,255,255,0.03);
+    font-size: 40px;
+    transform: rotate(-20deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 0;
+  }
+  .receipt-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 2;
+  }
+  .receipt-amount {
+    text-align: center;
+    font-size: 36px;
+    font-weight: 700;
+    color: #7c6cff;
+    margin-bottom: 6px;
+    position: relative;
+    z-index: 2;
+  }
+  .receipt-status {
+    text-align: center;
+    font-weight: 600;
+    margin-bottom: 4px;
+    position: relative;
+    z-index: 2;
+  }
+  .receipt-date {
+    text-align: center;
+    font-size: 13px;
+    color: #b3b3b3;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 2;
+  }
+  .divider {
+    border-top: 1px dashed #2a2a2f;
+    margin: 18px 0;
+    position: relative;
+    z-index: 2;
+  }
+  .row {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    position: relative;
+    z-index: 2;
+  }
+  .label {
+    color: #cfcfcf;
+    font-size: 14px;
+  }
+  .value {
+    text-align: right;
+    font-size: 14px;
+  }
+  .value strong {
+    display: block;
+    font-weight: 600;
+    color: var(--text-color, #fff);
+    transition: color 0.3s ease;
+  }
+  .sub {
+    font-size: 13px;
+    color: #a6a6a6;
+    margin-top: 2px;
+  }
+  [data-theme="light"] .label {
+    color: #666;
+  }
+  [data-theme="light"] .sub {
+    color: #888;
+  }
+  .section-title {
+    font-weight: 600;
+    margin-bottom: 10px;
+    position: relative;
+    z-index: 2;
+  }
+  .receipt-footer-note {
+    text-align: center;
+    font-size: 12px;
+    color: #9b9b9b;
+    margin-top: 20px;
+    line-height: 1.5;
+    position: relative;
+    z-index: 2;
+  } 
+    font-weight: 700; 
+    color: var(--text-color, #fff);
+    transition: color 0.3s ease;
+    text-align: right;
+  }
+  .receipt-sub-value { 
+    font-size: 12px; 
+    color: var(--muted); 
+    margin-top: 2px; 
+    text-align: right;
+  }
+  .receipt-info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--form-border, rgba(255,255,255,0.05));
+    transition: border-color 0.3s ease;
+    z-index: 1;
+    position: relative;
+  }
+  .receipt-info-label {
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .receipt-info-value {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-color, #fff);
+    transition: color 0.3s ease;
+    font-family: 'Courier New', monospace;
+  }
+  .receipt-footer-note {
+    text-align: center;
+    font-size: 11px;
+    color: var(--purple);
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--form-border, rgba(255,255,255,0.05));
+    transition: border-color 0.3s ease, color 0.3s ease;
+    z-index: 1;
+    position: relative;
+    letter-spacing: 0.5px;
+  }
+  .receipt-actions {
+    display: flex;
+    gap: 8px;
+    padding: 16px;
+    border-top: 1px solid var(--form-border, rgba(255,255,255,0.05));
+    background: var(--bg);
+    transition: border-color 0.3s ease, background 0.3s ease;
+  }
+  .receipt-action-btn {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid var(--form-border, rgba(255,255,255,0.1));
+    background: var(--input-bg, #0b0b0c);
+    color: var(--text-color, #fff);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: background 0.3s ease, border 0.3s ease, color 0.3s ease;
+  }
+</style>
+<!-- PWA Configuration -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#7c3aed">
+<meta name="description" content="A fast, secure banking dashboard with Paystack integration">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%237c3aed' width='192' height='192'/><text x='50%' y='50%' font-size='80' font-weight='bold' fill='white' text-anchor='middle' dy='.3em' font-family='sans-serif'>P</text></svg>">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%237c3aed' width='180' height='180' rx='40'/><text x='50%' y='50%' font-size='80' font-weight='bold' fill='white' text-anchor='middle' dy='.3em' font-family='sans-serif'>P</text></svg>">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PalmPay">
+</head>
+<body>
+<div class="app">
+  <header>
+    <button class="back-btn" id="backBtn" onclick="window.location.href='index.html'">←</button>
+    <div class="header-title">Transfer To Bank</div>
+    <div class="icons">
+      <div class="icon-btn" id="themeToggle" title="Toggle theme">
+        <svg id="themeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" style="transition: transform 0.3s ease;">
+          <!-- Sun icon (shown in dark mode) -->
+          <path id="sunIcon" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" style="display: block;"/>
+          <!-- Moon icon (shown in light mode) -->
+          <path id="moonIcon" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" style="display: none;"/>
+        </svg>
+      </div>
+    </div>
+  </header>
+
+  <!-- Transfer Form -->
+  <div class="form-card">
+    <div style="position:relative;margin-bottom:8px;">
+      <input type="text" id="bankSearch" placeholder="Search Bank or Type Bank Name Manually (e.g., OPay, Kuda, Access, UBA, WEMA)" autocomplete="off" style="width:100%;padding:8px;border-radius:6px;border:1px solid var(--select-border, rgba(255,255,255,0.02));background:var(--select-bg, #0b0b0c);color:var(--text-color, #fff);font-size:14px;transition:background 0.3s ease, border 0.3s ease, color 0.3s ease;">
+      <div id="bankDropdown" style="display:none;position:absolute;top:100%;left:0;right:0;max-height:300px;overflow-y:auto;background:var(--select-bg, #0b0b0c);border:1px solid var(--select-border, rgba(255,255,255,0.1));border-radius:6px;margin-top:4px;z-index:10000;box-shadow:var(--dropdown-shadow, 0 8px 24px rgba(0,0,0,0.5));transition:background 0.3s ease, border 0.3s ease, box-shadow 0.3s ease;"></div>
+      <div id="bankManualStatus" style="font-size:11px;margin-top:4px;color:var(--muted);min-height:14px;transition:color 0.3s ease;"></div>
+    </div>
+    <input type="hidden" id="bankSelect" value="">
+    <input type="text" id="bankAcct" placeholder="Bank Account Number (10 digits)" required maxlength="10" pattern="[0-9]{10}">
+    <input type="text" id="accountName" placeholder="Account Name (auto-filled or enter manually)" required>
+    <div id="accountVerificationStatus" style="font-size:12px;margin:4px 0;min-height:16px;"></div>
+    <button type="button" id="enterManuallyBtn" class="small-btn ghost" style="width:100%;margin-top:4px;display:none;">Enter Name Manually</button>
+    <input type="number" id="sendAmount" placeholder="₦ Amount" required>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="primary" id="submitTransfer" style="flex:1" disabled>Transfer</button>
+      <button type="button" class="small-btn ghost" id="cancelTransfer" style="flex:1">Cancel</button>
+    </div>
+    <div id="formStatus" class="status"></div>
+  </div>
+
+  <!-- Success Screen with Receipt -->
+  <div class="success-screen" id="successScreen">
+    <div class="receipt-top-bar">
+      <button class="receipt-back-btn" id="closeSuccess">&lt;</button>
+      <div class="receipt-title">Transaction Receipt</div>
+    </div>
+    <div id="receiptDetails" class="receipt-container"></div>
+    <div class="receipt-actions">
+      <button class="receipt-action-btn" id="shareReceipt"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8m-4-6l-4-4-4 4m4-4v10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Share as Image</button>
+      <button class="receipt-action-btn" id="saveReceipt"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M4 4h16v12H8V8H4V4zm4 4v8h12V4H8v4z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Save as PDF</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* -------------------------
+   Demo banking logic (localStorage)
+   ------------------------- */
+const LS_BAL = 'demo_balance_ngn';
+const LS_TX = 'demo_transactions_ngn';
+const LS_THEME = 'demo_theme';
+
+/* default data */
+let balance = parseFloat(localStorage.getItem(LS_BAL) || '556489.00');
+let transactions = JSON.parse(localStorage.getItem(LS_TX) || JSON.stringify([]));
+
+/* UI refs */
+const bankSelect = document.getElementById('bankSelect');
+const bankSearch = document.getElementById('bankSearch');
+const bankDropdown = document.getElementById('bankDropdown');
+const bankAcct = document.getElementById('bankAcct');
+const accountName = document.getElementById('accountName');
+const accountVerificationStatus = document.getElementById('accountVerificationStatus');
+const sendAmount = document.getElementById('sendAmount');
+const formStatus = document.getElementById('formStatus');
+const submitTransfer = document.getElementById('submitTransfer');
+const cancelTransfer = document.getElementById('cancelTransfer');
+const enterManuallyBtn = document.getElementById('enterManuallyBtn');
+const successScreen = document.getElementById('successScreen');
+const receiptDetails = document.getElementById('receiptDetails');
+const closeSuccess = document.getElementById('closeSuccess');
+
+// Paystack integration state
+let banksList = [];
+let filteredBanksList = [];
+let selectedBankCode = null;
+let selectedBankName = '';
+let isAccountVerified = false;
+let isManualBankEntry = false;
+
+// API base URL
+const API_BASE_URL = window.location.port === '5502' || window.location.port === '5500' 
+  ? 'http://localhost:3000' 
+  : '';
+
+const userName = 'Tiamiyu Abdulsalam';
+const senderAccountMask = '904***9211';
+
+/* helpers */
+function genId() { return Math.random().toString(36).slice(2, 14); }
+function genSessId() { return Math.floor(Math.random() * 1e15) + ' ' + Math.floor(Math.random() * 1e14); }
+function saveState() { localStorage.setItem(LS_BAL, balance); localStorage.setItem(LS_TX, JSON.stringify(transactions)); }
+function formatNGN(n) { return '₦ ' + Number(n).toLocaleString('en-NG', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+function getFormattedDate(ts) {
+  const date = new Date(ts);
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) + ' ' + date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true });
+}
+
+// Theme toggle
+const themeToggle = document.getElementById('themeToggle');
+const currentTheme = localStorage.getItem(LS_THEME) || 'dark';
+document.documentElement.setAttribute('data-theme', currentTheme);
+
+// Update theme icon based on current theme
+function updateThemeIcon() {
+  const currentTheme = document.documentElement.getAttribute('data-theme');
+  const sunIcon = document.getElementById('sunIcon');
+  const moonIcon = document.getElementById('moonIcon');
+  
+  if (currentTheme === 'light') {
+    if (sunIcon) sunIcon.style.display = 'none';
+    if (moonIcon) moonIcon.style.display = 'block';
+  } else {
+    if (sunIcon) sunIcon.style.display = 'block';
+    if (moonIcon) moonIcon.style.display = 'none';
+  }
+}
+
+themeToggle.addEventListener('click', () => {
+  const currentTheme = document.documentElement.getAttribute('data-theme');
+  const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', newTheme);
+  localStorage.setItem(LS_THEME, newTheme);
+  updateThemeIcon();
+});
+
+// Initialize theme icon on page load
+updateThemeIcon();
+
+// Fintech banks that are not in Paystack's list
+const FINTECH_BANKS = [
+  { name: 'OPay', code: '999992', isFintech: true },
+  { name: 'PalmPay', code: '999991', isFintech: true },
+  { name: 'MoniePoint', code: '50515', isFintech: true },
+  { name: 'Kuda Bank', code: '50211', isFintech: true },
+  { name: 'UBA Bank', code: '50201', isFintech: true },
+  { name: 'ACCESS Bank', code: '50291', isFintech: true },
+  { name: 'WEMA Bank', code: '50202', isFintech: true },
+  { name: 'FIRST BANK', code: '59202', isFintech: true },
+  { name: 'Carbon', code: '50457', isFintech: true }
+];
+
+// Paystack API functions
+async function loadBanks() {
+  try {
+    accountVerificationStatus.textContent = 'Loading banks...';
+    accountVerificationStatus.style.color = 'var(--muted)';
+    
+    const response = await fetch(`${API_BASE_URL}/api/paystack/banks`);
+    const data = await response.json();
+    
+    if (data.status && data.data) {
+      banksList = data.data.map(bank => ({ ...bank, isFintech: false }));
+      
+      FINTECH_BANKS.forEach(fintech => {
+        const exists = banksList.find(b => b.code === fintech.code || b.name.toLowerCase() === fintech.name.toLowerCase());
+        if (!exists) {
+          banksList.push(fintech);
+        }
+      });
+      
+      banksList.sort((a, b) => a.name.localeCompare(b.name));
+      filteredBanksList = banksList;
+      console.log(`✅ Loaded ${data.data.length} Paystack banks + ${FINTECH_BANKS.length} fintech banks = ${banksList.length} total`);
+      
+      accountVerificationStatus.textContent = `✅ ${banksList.length} banks loaded (including fintech) - Click search box to see all banks`;
+      accountVerificationStatus.style.color = '#22c55e';
+      setTimeout(() => {
+        accountVerificationStatus.textContent = '';
+      }, 4000);
+    } else {
+      console.error('❌ Failed to load banks:', data);
+      banksList = FINTECH_BANKS.map(b => ({ ...b, isFintech: true }));
+      filteredBanksList = banksList;
+      accountVerificationStatus.textContent = `⚠️ Using fintech banks only (${banksList.length} banks). Paystack API unavailable.`;
+      accountVerificationStatus.style.color = '#f59e0b';
+      setTimeout(() => {
+        accountVerificationStatus.textContent = '';
+      }, 4000);
+    }
+  } catch (error) {
+    console.error('❌ Error loading banks:', error);
+    banksList = FINTECH_BANKS.map(b => ({ ...b, isFintech: true }));
+    filteredBanksList = banksList;
+    accountVerificationStatus.textContent = `⚠️ Using fintech banks only (${banksList.length} banks). Server connection failed.`;
+    accountVerificationStatus.style.color = '#f59e0b';
+    setTimeout(() => {
+      accountVerificationStatus.textContent = '';
+    }, 4000);
+  }
+}
+
+function filterBanks(searchTerm) {
+  if (!banksList || banksList.length === 0) {
+    console.log('Banks list is empty');
+    return;
+  }
+
+  if (!searchTerm || searchTerm.trim() === '') {
+    filteredBanksList = banksList.slice(0, 50);
+    renderBankDropdown();
+    return;
+  }
+
+  const term = searchTerm.toLowerCase().trim();
+  filteredBanksList = banksList.filter(bank => {
+    const name = bank.name.toLowerCase();
+    const code = bank.code.toLowerCase();
+    
+    const matchesName = name.includes(term);
+    const matchesCode = code.includes(term);
+    
+    const aliases = {
+      'opay': ['opay', 'o pay', 'opay digital'],
+      'kuda': ['kuda', 'kuda bank', 'kuda microfinance'],
+      'palmpay': ['palmpay', 'palm pay', 'palm'],
+      'carbon': ['carbon', 'carbon bank'],
+      'rubies': ['rubies', 'rubies bank'],
+      'vfd': ['vfd', 'vfd microfinance'],
+      'fcmb': ['fcmb', 'first city monument'],
+      'gtb': ['gtb', 'guaranty trust'],
+      'uba': ['uba', 'united bank for africa'],
+      'wema': ['wema', 'wema bank'],
+      'zenith': ['zenith', 'zenith bank'],
+      'access': ['access', 'access bank'],
+      'first bank': ['first bank', 'firstbank', 'fbn']
+    };
+    
+    let matchesAlias = false;
+    for (const [key, values] of Object.entries(aliases)) {
+      if (values.some(alias => alias.includes(term))) {
+        matchesAlias = values.some(alias => name.includes(alias.replace(term, '').trim()) || name.includes(key));
+        if (matchesAlias) break;
+      }
+    }
+    
+    return matchesName || matchesCode || matchesAlias;
+  });
+  
+  console.log(`Filtered ${filteredBanksList.length} banks for search: "${term}"`);
+  renderBankDropdown();
+}
+
+function renderBankDropdown() {
+  if (!bankDropdown) {
+    console.error('bankDropdown element not found');
+    return;
+  }
+
+  bankDropdown.innerHTML = '';
+  
+  if (!filteredBanksList || filteredBanksList.length === 0) {
+    if (banksList.length === 0) {
+      bankDropdown.innerHTML = '<div style="padding:12px;text-align:center;color:var(--muted);font-size:12px;transition:color 0.3s ease;">Loading banks...</div>';
+    } else {
+      bankDropdown.innerHTML = '<div style="padding:12px;text-align:center;color:var(--muted);font-size:12px;transition:color 0.3s ease;">No banks found. Try a different search.</div>';
+    }
+    bankDropdown.style.display = 'block';
+    return;
+  }
+
+  filteredBanksList.forEach(bank => {
+    const bankItem = document.createElement('div');
+    bankItem.style.cssText = 'padding:10px 12px;cursor:pointer;border-bottom:1px solid var(--select-border, rgba(255,255,255,0.05));transition:background 0.2s ease, border-color 0.3s ease;';
+    
+    const fintechBadge = bank.isFintech 
+      ? '<span style="background:#3b82f6;color:#fff;padding:2px 6px;border-radius:4px;font-size:9px;font-weight:600;margin-left:6px;">Fintech</span>' 
+      : '';
+    
+    bankItem.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div style="flex:1;">
+          <div style="font-weight:600;font-size:14px;color:var(--text-color, #fff);display:flex;align-items:center;transition:color 0.3s ease;">${bank.name}${fintechBadge}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;transition:color 0.3s ease;">Code: ${bank.code}</div>
+        </div>
+      </div>
+    `;
+    
+    bankItem.addEventListener('mouseenter', () => {
+      bankItem.style.background = 'var(--tx-bg, #1a1a1f)';
+    });
+    bankItem.addEventListener('mouseleave', () => {
+      bankItem.style.background = 'transparent';
+    });
+    
+    bankItem.addEventListener('click', () => {
+      selectedBankCode = bank.code;
+      selectedBankName = bank.name;
+      bankSelect.value = bank.code;
+      bankSearch.value = bank.name;
+      isManualBankEntry = false;
+      bankDropdown.style.display = 'none';
+      
+      const bankManualStatus = document.getElementById('bankManualStatus');
+      if (bankManualStatus) {
+        bankManualStatus.textContent = `✓ ${bank.name} selected`;
+        bankManualStatus.style.color = '#22c55e';
+      }
+      
+      accountName.value = '';
+      accountName.disabled = false;
+      accountName.placeholder = 'Account Name (auto-filled or enter manually)';
+      accountVerificationStatus.textContent = '';
+      isAccountVerified = false;
+      submitTransfer.disabled = true;
+      enterManuallyBtn.style.display = 'none';
+      
+      if (bankAcct.value.length === 10) {
+        verifyAccount(bankAcct.value, selectedBankCode);
+      }
+    });
+    
+    bankDropdown.appendChild(bankItem);
+  });
+  
+  bankDropdown.style.display = 'block';
+  console.log(`Showing ${filteredBanksList.length} banks in dropdown`);
+}
+
+// Bank search input handler
+if (bankSearch) {
+  const bankManualStatus = document.getElementById('bankManualStatus');
+  
+  bankSearch.addEventListener('input', (e) => {
+    const searchTerm = e.target.value;
+    console.log('Searching for:', searchTerm, 'Banks available:', banksList.length);
+    
+    if (searchTerm.length > 0) {
+      filterBanks(searchTerm);
+    } else {
+      bankDropdown.style.display = 'none';
+      selectedBankCode = null;
+      selectedBankName = '';
+      isManualBankEntry = false;
+      if (bankManualStatus) bankManualStatus.textContent = '';
+    }
+  });
+
+  bankSearch.addEventListener('blur', (e) => {
+    const bankName = e.target.value.trim();
+    
+    if (bankName.length > 0) {
+      const matchedBank = banksList.find(b => 
+        b.name.toLowerCase() === bankName.toLowerCase() ||
+        b.name.toLowerCase().includes(bankName.toLowerCase())
+      );
+      
+      if (matchedBank) {
+        selectedBankCode = matchedBank.code;
+        selectedBankName = matchedBank.name;
+        bankSelect.value = matchedBank.code;
+        bankSearch.value = matchedBank.name;
+        isManualBankEntry = false;
+        if (bankManualStatus) {
+          bankManualStatus.textContent = `✓ ${matchedBank.name} selected`;
+          bankManualStatus.style.color = '#22c55e';
+        }
+        
+        if (bankAcct.value.length === 10) {
+          verifyAccount(bankAcct.value, selectedBankCode);
+        }
+      } else {
+        selectedBankCode = null;
+        selectedBankName = bankName;
+        isManualBankEntry = true;
+        bankSelect.value = '';
+        if (bankManualStatus) {
+          bankManualStatus.textContent = `✓ Using manual entry: ${bankName} (Account verification may be limited)`;
+          bankManualStatus.style.color = '#f59e0b';
+        }
+        
+        accountName.value = '';
+        accountName.disabled = false;
+        accountName.placeholder = 'Account Name (enter manually)';
+        accountVerificationStatus.textContent = 'Manual bank entry - Enter account name manually';
+        accountVerificationStatus.style.color = '#f59e0b';
+        isAccountVerified = false;
+        submitTransfer.disabled = true;
+      }
+    } else {
+      selectedBankCode = null;
+      selectedBankName = '';
+      isManualBankEntry = false;
+      if (bankManualStatus) bankManualStatus.textContent = '';
+    }
+    
+    setTimeout(() => {
+      bankDropdown.style.display = 'none';
+    }, 200);
+  });
+
+  bankSearch.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      bankSearch.blur();
+    }
+  });
+
+  bankSearch.addEventListener('focus', () => {
+    console.log('Bank search focused. Banks loaded:', banksList.length);
+    if (banksList.length > 0) {
+      filterBanks(bankSearch.value);
+    } else {
+      bankDropdown.innerHTML = '<div style="padding:12px;text-align:center;color:var(--muted);font-size:12px;transition:color 0.3s ease;">Loading banks... Please wait.</div>';
+      bankDropdown.style.display = 'block';
+    }
+  });
+
+  bankSearch.addEventListener('click', () => {
+    if (banksList.length > 0) {
+      filterBanks(bankSearch.value);
+    }
+  });
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', (e) => {
+  if (bankSearch && bankDropdown) {
+    if (!bankSearch.contains(e.target) && !bankDropdown.contains(e.target)) {
+      bankDropdown.style.display = 'none';
+    }
+  }
+});
+
+// Helper function to generate mock account names
+function generateMockAccountNameFallback(accountNumber) {
+  const firstNames = ['Ade', 'Chukwu', 'Ibrahim', 'Musa', 'Oluwaseun', 'Fatima', 'Amina', 'Emeka', 'Ngozi', 'Kemi', 'John', 'Mary', 'David', 'Grace'];
+  const lastNames = ['Adebayo', 'Okafor', 'Mohammed', 'Ibrahim', 'Okoro', 'Adekunle', 'Bello', 'Okafor', 'Nwankwo', 'Adeyemi', 'Smith', 'Johnson', 'Williams', 'Brown'];
+  const seed = parseInt(accountNumber.slice(-4)) % 100;
+  const firstName = firstNames[seed % firstNames.length];
+  const lastName = lastNames[Math.floor(seed / 10) % lastNames.length];
+  return `${firstName} ${lastName}`.toUpperCase();
+}
+
+async function verifyAccount(accountNumber, bankCode) {
+  if (!accountNumber || !bankCode) return;
+  
+  if (accountNumber.length !== 10) {
+    accountVerificationStatus.textContent = '';
+    accountName.value = '';
+    accountName.disabled = false;
+    accountName.placeholder = 'Account Name (auto-filled or enter manually)';
+    isAccountVerified = false;
+    submitTransfer.disabled = true;
+    enterManuallyBtn.style.display = 'none';
+    return;
+  }
+
+  try {
+    accountVerificationStatus.textContent = 'Verifying account...';
+    accountVerificationStatus.style.color = 'var(--muted)';
+    accountName.disabled = false;
+    accountName.placeholder = 'Account Name (auto-filled or enter manually)';
+    enterManuallyBtn.style.display = 'none';
+    
+    const response = await fetch(`${API_BASE_URL}/api/paystack/verify`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        account_number: accountNumber,
+        bank_code: bankCode
+      })
+    });
+
+    const data = await response.json();
+    
+    if (!data.status && data.message) {
+      const errorMessage = data.message.toLowerCase();
+      if (errorMessage.includes('limit') || errorMessage.includes('daily') || errorMessage.includes('exceeded')) {
+        console.log('Frontend detected limit error, using mock account name');
+        accountName.value = generateMockAccountNameFallback(accountNumber);
+        accountName.disabled = false;
+        accountVerificationStatus.textContent = '✓ Account verified (Test Mode) - You can edit the name if needed';
+        accountVerificationStatus.style.color = '#22c55e';
+        isAccountVerified = true;
+        submitTransfer.disabled = false;
+        enterManuallyBtn.style.display = 'none';
+        return;
+      }
+    }
+    
+    if (data.status && data.data) {
+      accountName.value = data.data.account_name;
+      accountName.disabled = false;
+      let statusText = '✓ Account verified';
+      
+      if (data.data.is_mock) {
+        statusText += ' (Test Mode)';
+      } else if (data.data.is_fintech) {
+        statusText += ' (Fintech)';
+      }
+      
+      accountVerificationStatus.textContent = statusText + ' - You can edit the name if needed';
+      accountVerificationStatus.style.color = '#22c55e';
+      isAccountVerified = true;
+      submitTransfer.disabled = false;
+      enterManuallyBtn.style.display = 'none';
+    } else {
+      accountName.value = '';
+      accountName.disabled = false;
+      accountName.placeholder = 'Account Name (enter manually)';
+      accountVerificationStatus.textContent = data.message || 'Account verification failed - Enter name manually';
+      accountVerificationStatus.style.color = '#f59e0b';
+      enterManuallyBtn.style.display = 'block';
+      
+      const checkManualName = function() {
+        if (accountName.value.trim().length >= 3) {
+          isAccountVerified = true;
+          submitTransfer.disabled = false;
+          accountVerificationStatus.textContent = '✓ Ready to transfer (Manual Entry)';
+          accountVerificationStatus.style.color = '#22c55e';
+        } else if (accountName.value.trim().length > 0) {
+          isAccountVerified = false;
+          submitTransfer.disabled = true;
+          accountVerificationStatus.textContent = 'Enter account name (minimum 3 characters)';
+          accountVerificationStatus.style.color = '#f59e0b';
+        }
+      };
+      
+      accountName.removeEventListener('input', window.manualNameHandler);
+      window.manualNameHandler = checkManualName;
+      accountName.addEventListener('input', window.manualNameHandler);
+      
+      isAccountVerified = false;
+      submitTransfer.disabled = true;
+    }
+  } catch (error) {
+    console.error('Error verifying account:', error);
+    accountName.value = '';
+    accountName.disabled = false;
+    accountName.placeholder = 'Account Name (enter manually)';
+    accountVerificationStatus.textContent = 'Error verifying account - Enter name manually';
+    accountVerificationStatus.style.color = '#f59e0b';
+    enterManuallyBtn.style.display = 'block';
+    
+    accountName.addEventListener('input', function checkManualName() {
+      if (accountName.value.trim().length >= 3) {
+        isAccountVerified = true;
+        submitTransfer.disabled = false;
+        accountVerificationStatus.textContent = '✓ Ready to transfer (Manual Entry)';
+        accountVerificationStatus.style.color = '#22c55e';
+      } else if (accountName.value.trim().length > 0) {
+        isAccountVerified = false;
+        submitTransfer.disabled = true;
+        accountVerificationStatus.textContent = 'Enter account name (minimum 3 characters)';
+        accountVerificationStatus.style.color = '#f59e0b';
+      }
+    }, { once: false });
+    
+    isAccountVerified = false;
+    submitTransfer.disabled = true;
+  }
+}
+
+// Account number input - auto verify when 10 digits
+bankAcct.addEventListener('input', (e) => {
+  const accountNumber = e.target.value.replace(/\D/g, '');
+  e.target.value = accountNumber;
+  
+  if (accountNumber.length === 10 && selectedBankCode) {
+    verifyAccount(accountNumber, selectedBankCode);
+  } else if (accountNumber.length === 10 && isManualBankEntry && selectedBankName) {
+    accountName.disabled = false;
+    accountName.placeholder = 'Account Name (enter manually)';
+    accountVerificationStatus.textContent = `Manual bank entry (${selectedBankName}) - Enter account name manually`;
+    accountVerificationStatus.style.color = '#f59e0b';
+    isAccountVerified = false;
+    submitTransfer.disabled = true;
+    enterManuallyBtn.style.display = 'block';
+  } else if (accountNumber.length !== 10) {
+    accountName.value = '';
+    accountName.disabled = false;
+    accountName.placeholder = 'Account Name (auto-filled or enter manually)';
+    accountVerificationStatus.textContent = '';
+    isAccountVerified = false;
+    submitTransfer.disabled = true;
+    enterManuallyBtn.style.display = 'none';
+  }
+});
+
+submitTransfer.addEventListener('click', async () => {
+  const bName = selectedBankName || bankSearch.value.trim();
+  const bAcct = bankAcct.value.trim();
+  const aName = accountName.value.trim();
+  const amount = parseFloat(sendAmount.value || '0');
+
+  if ((!selectedBankCode && !isManualBankEntry) || !bName || !bAcct || !aName || !amount || amount <= 0) {
+    showStatus('Please fill all fields with valid details', false, formStatus);
+    return;
+  }
+  
+  if (isManualBankEntry && aName.length < 3) {
+    showStatus('Please enter account name (minimum 3 characters)', false, formStatus);
+    return;
+  }
+  
+  if (!isManualBankEntry && !isAccountVerified) {
+    showStatus('Please verify the account number or enter account name manually', false, formStatus);
+    return;
+  }
+  
+  if (isManualBankEntry && aName.length >= 3) {
+    isAccountVerified = true;
+  }
+  if (amount > balance) {
+    showStatus('Insufficient balance', false, formStatus);
+    return;
+  }
+  if (!/^\d{10}$/.test(bAcct)) {
+    showStatus('Bank account number must be 10 digits', false, formStatus);
+    return;
+  }
+
+  submitTransfer.classList.add('loading');
+  await new Promise(resolve => setTimeout(resolve, 1000));
+
+  balance = +(balance - amount).toFixed(2);
+  const now = Date.now();
+  const sessId = genSessId();
+  const tx = { id: genId(), name: `Interbank to ${aName} (${bName} | ${bAcct})`, amount: -amount, time: now, sessId: sessId };
+  transactions.unshift(tx);
+  saveState();
+
+  receiptDetails.innerHTML = `
+    <div class="receipt-logo">PalmPay</div>
+
+    <div class="receipt-amount">${formatNGN(amount)}</div>
+    <div class="receipt-status">Successful Transaction</div>
+    <div class="receipt-date">${getFormattedDate(now)}</div>
+
+    <div class="divider"></div>
+
+    <div class="row">
+      <div class="label">Recipient:</div>
+      <div class="value">
+        <strong>${aName}</strong>
+        <div class="sub">${bName} | ${bAcct}</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="row">
+      <div class="label">Sender:</div>
+      <div class="value">
+        <strong>${userName.toUpperCase()}</strong>
+        <div class="sub">PalmPay | ${senderAccountMask}</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="section-title">Transaction Info:</div>
+
+    <div class="row">
+      <div class="label">Transaction Type</div>
+      <div class="value">Interbank Transfer</div>
+    </div>
+
+    <div class="row" style="margin-top: 10px;">
+      <div class="label">Transaction ID</div>
+      <div class="value">${tx.id}</div>
+    </div>
+
+    <div class="row" style="margin-top: 10px;">
+      <div class="label">Session ID</div>
+      <div class="value">
+        ${sessId.slice(0, 15)}<br/>
+        ${sessId.slice(15)}
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="receipt-footer-note">Enjoy Seamless and Unlimited Free Transfers to All Banks.</div>
+  `;
+  submitTransfer.classList.remove('loading');
+  successScreen.classList.add('active');
+  attachReceiptActions();
+});
+
+cancelTransfer.addEventListener('click', () => {
+  window.location.href = 'index.html';
+});
+
+closeSuccess.addEventListener('click', () => {
+  successScreen.classList.remove('active');
+  receiptDetails.innerHTML = '';
+  window.location.href = 'index.html';
+});
+
+function attachReceiptActions() {
+  document.getElementById('shareReceipt').addEventListener('click', () => {
+    alert('Share as Image: In a real app, this would share the receipt as an image.');
+  });
+  document.getElementById('saveReceipt').addEventListener('click', () => {
+    alert('Save as PDF: In a real app, this would download the receipt as PDF.');
+  });
+}
+
+let statusTimer = null;
+function showStatus(msg, ok, statusElement = formStatus) {
+  statusElement.textContent = msg;
+  statusElement.style.color = ok ? '#22c55e' : '#ff4d4f';
+  if (statusTimer) clearTimeout(statusTimer);
+  statusTimer = setTimeout(() => {
+    statusElement.textContent = '';
+  }, 5000);
+}
+
+// Load banks on page load
+loadBanks();
+</script>
+
+<!-- PWA Service Worker Registration -->
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js')
+      .then(registration => {
+        console.log('✓ Service Worker registered:', registration.scope);
+      })
+      .catch(error => {
+        console.error('✗ Service Worker registration failed:', error);
+      });
+  });
+}
+
+// Prompt for PWA installation
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  console.log('PWA is installable');
+});
+
+window.addEventListener('appinstalled', () => {
+  console.log('✓ PWA installed successfully');
+  deferredPrompt = null;
+});
+</script>
+</body>
+</html>
+
