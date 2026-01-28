@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Transaction Receipt</title>
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background: #0f0f12;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+    }
+
+    .phone {
+      width: 390px;
+      max-width: 95%;
+    }
+
+    /* Top Bar */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding: 14px 0;
+      color: #fff;
+      font-weight: 500;
+      font-size: 18px;
+    }
+
+    .back-arrow {
+      position: absolute;
+      left: 10px;
+      font-size: 22px;
+      cursor: pointer;
+    }
+
+    /* Receipt Card */
+    .receipt {
+      background: #17171c;
+      border-radius: 20px;
+      padding: 24px;
+      margin-top: 14px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Watermark */
+    .receipt::before {
+      content: "PalmPay  PalmPay  PalmPay  PalmPay";
+      position: absolute;
+      inset: 0;
+      color: rgba(255,255,255,0.03);
+      font-size: 40px;
+      transform: rotate(-20deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .content {
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Header */
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .amount {
+      text-align: center;
+      font-size: 36px;
+      font-weight: 700;
+      color: #7c6cff;
+      margin-bottom: 6px;
+    }
+
+    .status {
+      text-align: center;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .date {
+      text-align: center;
+      font-size: 13px;
+      color: #b3b3b3;
+      margin-bottom: 20px;
+    }
+
+    .divider {
+      border-top: 1px dashed #2a2a2f;
+      margin: 18px 0;
+    }
+
+    /* Rows */
+    .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .label {
+      color: #cfcfcf;
+      font-size: 14px;
+    }
+
+    .value {
+      text-align: right;
+      font-size: 14px;
+    }
+
+    .value strong {
+      display: block;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .sub {
+      font-size: 13px;
+      color: #a6a6a6;
+      margin-top: 2px;
+    }
+
+    /* Section title */
+    .section-title {
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      font-size: 12px;
+      color: #9b9b9b;
+      margin-top: 20px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="phone">
+    <div class="top-bar">
+      <div class="back-arrow">←</div>
+      Transaction receipt
+    </div>
+
+    <div class="receipt">
+      <div class="content">
+
+        <div class="logo">PalmPay</div>
+
+        <div class="amount">₦520.00</div>
+        <div class="status">Successful Transaction</div>
+        <div class="date">Dec 21, 2025 4:51:55 pm</div>
+
+        <div class="divider"></div>
+
+        <!-- Recipient -->
+        <div class="row">
+          <div class="label">Recipient:</div>
+          <div class="value">
+            <strong>RONKE OMOLARA OYAFAJO</strong>
+            <div class="sub">Opay | 806 391 1415</div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Sender -->
+        <div class="row">
+          <div class="label">Sender:</div>
+          <div class="value">
+            <strong>ABDULSALAM TIAMIYU</strong>
+            <div class="sub">PalmPay | 904****9211</div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Transaction Info -->
+        <div class="section-title">Transaction Info:</div>
+
+        <div class="row">
+          <div class="label">Transaction Type</div>
+          <div class="value">Money Transfer - MMO</div>
+        </div>
+
+        <div class="row" style="margin-top: 10px;">
+          <div class="label">Transaction ID</div>
+          <div class="value">032x1o55c5a00</div>
+        </div>
+
+        <div class="row" style="margin-top: 10px;">
+          <div class="label">Session ID</div>
+          <div class="value">
+            100033251221155<br/>
+            200608633061743
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="footer">
+          Enjoy Seamless and Unlimited Free Transfers to All Banks.
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
